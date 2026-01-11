@@ -10,17 +10,22 @@
 
 <body>
 
-    <div class="ph-otp">
-        <input type="tel" id="phone" pattern="[0-9]" maxlength="11" placeholder="123-456-7890"><br>
-        <button id="otp-btn">Send OTP</button><br>
-        <input type="number" id="otp-phone" min="0"><br>
-        <button id="verify-otp">Verify</button>
+<div class="auth-container">
+    <h2>Phone Authentication</h2>
 
-    </div>
+    <input type="text" id="phone" placeholder="+92XXXXXXXXXX">
+    <button id="sendOtp">Send OTP</button>
 
-    <div class="home_s">
-        <h1>Welcome to Dashboard Screen</h1>
-    </div>
+    
+
+    <input type="text" id="otp" placeholder="Enter OTP">
+    <button id="verifyOtp">Verify OTP</button>
+
+    
+    <div id="recaptcha-container"></div>
+</div>
+
+    <script src="firebase.js" type="module"></script>
     <script src="app.js" type="module"></script>
 </body>
 

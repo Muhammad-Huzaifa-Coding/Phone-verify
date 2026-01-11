@@ -1,57 +1,54 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { auth, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "/firebase.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyC-Mtzd0icA9Q4PJY0gXvcFZdoHejtQz3E",
-    authDomain: "phone-7eede.firebaseapp.com",
-    projectId: "phone-7eede",
-    storageBucket: "phone-7eede.firebasestorage.app",
-    messagingSenderId: "358327082622",
-    appId: "1:358327082622:web:e9adad2ddce45d13f0822f"
-};
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const uid = user.uid;
+        // ...
+    } else {
+        // User is signed out
+        // ...
+    }
+});
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
-const phone_no = document.getElementById("phone");
-const sent_otp = document.getElementById("otp-btn");
-const verify_otp = document.getElementById("verify-otp");
-const home_screen = document.querySelector(".home_s");
-const otp_screen = document.querySelector(".ph-otp");
+window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    'recaptcha-container',
+    {}
+);
 
-const sentotp = () => {
 
-    signInWithPhoneNumber(auth, phone_no.value, window.recaptchaVerifier)
+document.getElementById("sendOtp").addEventListener("click", () => {
+    const phoneNumber = document.getElementById("phone").value;
+    const appVerifier = window.recaptchaVerifier;
+
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
         .then((confirmationResult) => {
             window.confirmationResult = confirmationResult;
-            alert("OTP Sent")
-        }).catch((error) => {
-            alert(error)
+            alert("OTP Sent Successfully");
+        })
+        .catch((error) => {
+            console.error(error);
+            alert(error.message);
         });
-}
+});
 
-sent_otp.addEventListener("click", sentotp)
 
-const verify = () => {
+document.getElementById("verifyOtp").addEventListener("click", () => {
+    const code = document.getElementById("otp").value;
 
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'normal',
-        'callback': (response) => {
-            home_screen.style.display = "block";
-            otp_screen.style.display = "none";
+    confirmationResult.confirm(code)
+        .then((result) => {
+            const user = result.user;
+            console.log("User signed in:", user);
+            alert("Authentication Successful");
+        })
+        .catch((error) => {
+            console.error(error);
+            alert("Invalid OTP");
+        });
+});
 
-        },
-        'expired-callback': () => {
-            home_screen.style.display = "none";
-            otp_screen.style.display = "block";
-        }
-    });
-}
 
-verify_otp.addEventListener("click", verify);
-const recaptchaResponse = grecaptcha.getResponse(recaptchaWidgetId);
